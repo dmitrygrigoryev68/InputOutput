@@ -28,16 +28,6 @@ public class Main {
         persons.add(p6);
         persons.add(p7);
 
-
-        try (InputStream is = new FileInputStream("inputBirthdayList.txt")) {
-            int read;
-            byte[] buffer = new byte[128];
-            while ((read = is.read(buffer)) != -1) {
-                System.out.println("Read bytes " + read);
-            }
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
 //Create sort keys for 2.2 and 2.3
         Key keyBirthday = s -> Integer.parseInt(s.substring(s.indexOf(",")).substring(7)
                 + s.substring(s.indexOf(",")).substring(4, 6)
@@ -59,10 +49,16 @@ public class Main {
 //1.3
         myListPrinter(sortByAge("test.csv"));
 //1.4
-        outputFromSortedByAgeListToFile(persons,"output.csv");
+        outputFromSortedByAgeListToFile(persons, "output.csv");
+
+        copyFile("c:\\TEMP\\eclipse.zip","c:\\TEMP2\\xxx.zip ");
+
+        copyFileBuff("c:\\TEMP\\eclipse.zip","c:\\TEMP2\\xxx1.zip ");
+
+        copyFileAvailable("c:\\TEMP\\eclipse.zip", "c:\\TEMP2\\xxx2.zip ");
     }
 
-//input from file to Map
+    //input from file to Map
     public static Map<Integer, String> InputToSortedMap(String fileName, Key key) {
         Map<Integer, String> map = new TreeMap<>();
         try (BufferedReader is = new BufferedReader(new FileReader(fileName))) {
@@ -76,7 +72,7 @@ public class Main {
         return map;
     }
 
-//output from Map to file
+    //output from Map to file
     public static void outputFromMapToFile(Map<Integer, String> map, String fileName) {
         try (BufferedWriter printer = new BufferedWriter(new FileWriter(fileName))) {
             for (String s : map.values()) {
@@ -87,7 +83,8 @@ public class Main {
             ex.printStackTrace();
         }
     }
-//input and sum
+
+    //input and sum
     public static Integer sumFromFile(String fileName) {
         Integer sum = 0;
         try (BufferedReader is = new BufferedReader(new FileReader(fileName))) {
@@ -100,7 +97,8 @@ public class Main {
         }
         return sum;
     }
-//sorting of array by Stream API
+
+    //sorting of array by Stream API
     public static List<String> sortedArray(String[] strings) {
         List<String> list = Arrays.asList(strings);
         return list
@@ -109,7 +107,8 @@ public class Main {
                 .collect(Collectors.toList());
 
     }
-//input from file to List of persons, age > 17
+
+    //input from file to List of persons, age > 17
     public static List<Person> sortByAge(String fileName) {
         List<Person> list = new LinkedList<>();
         try (BufferedReader is = new BufferedReader(new FileReader(fileName))) {
@@ -127,22 +126,25 @@ public class Main {
                 .sorted(Comparator.comparingInt(s -> s.getAge()))
                 .collect(Collectors.toList());
     }
-// transforming String from file to class Person
+
+    //transforming String from file to class Person
 
     public static Person stringToPersonTransformer(String string) {
         String name = string.split(",")[0];
         int age = Integer.parseInt(string.split(",")[1]);
         return new Person(name, age);
     }
-//printer of List
+
+    //printer of List
     public static void myListPrinter(List<Person> person) {
         person.stream()
                 .forEach(s -> System.out.println(s));
     }
-//output from sorted List
+
+    //output from sorted List
     public static void outputFromSortedByAgeListToFile(List<PersonForCSV> list, String fileName) {
         try (BufferedWriter printer = new BufferedWriter(new FileWriter(fileName))) {
-            Collections.sort(list,Comparator.comparingInt(PersonForCSV::getAge));
+            Collections.sort(list, Comparator.comparingInt(PersonForCSV::getAge));
             for (int i = 0; i < list.size(); i++) {
                 String s = list.get(i).getFirstName() + " "
                         + list.get(i).getSecondName()
@@ -154,4 +156,48 @@ public class Main {
             ex.printStackTrace();
         }
     }
+
+    //copyFile with block 10 kb
+    public static void copyFile(String from, String to) {
+        try (InputStream is = new FileInputStream(from);
+             OutputStream os = new FileOutputStream(to)) {
+            int read;
+            byte[] buffer = new byte[10000];
+            while ((read = is.read(buffer)) != -1) {
+                System.out.println("Read bytes " + read);
+                os.write(buffer);
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    //copyFile with bytes
+    public static void copyFileBuff(String from, String to) {
+        try (BufferedReader is = new BufferedReader(new FileReader(from));
+             BufferedWriter os = new BufferedWriter(new FileWriter(to))) {
+            int read;
+            while ((read = is.read()) != -1) {
+                os.write(read);
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
+
+        }
+    }
+
+    //copyFile with available()
+    public static void copyFileAvailable(String from, String to) {
+        try (InputStream is = new FileInputStream(from);
+             OutputStream os = new FileOutputStream(to)) {
+            byte[] buffer = new byte[10000];
+            while (is.available() != -1) {
+                os.write(buffer);
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+
 }
