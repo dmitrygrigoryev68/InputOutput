@@ -50,12 +50,12 @@ public class Main {
         myListPrinter(sortByAge("test.csv"));
 //1.4
         outputFromSortedByAgeListToFile(persons, "output.csv");
-
-        copyFile("c:\\TEMP\\eclipse.zip","c:\\TEMP2\\xxx.zip ");
-
-        copyFileBuff("c:\\TEMP\\eclipse.zip","c:\\TEMP2\\xxx1.zip ");
-
-        copyFileAvailable("c:\\TEMP\\eclipse.zip", "c:\\TEMP2\\xxx2.zip ");
+//2.1.1
+        copyFileBytes("c:\\TEMP\\eclipse.zip", "c:\\TEMP2\\xxx.zip ");
+//2.1.2
+        copyFileBlocksOfBytes("c:\\TEMP\\eclipse.zip", "c:\\TEMP2\\xxx1.zip ");
+//2.1.3
+        copyFileWithAvailable("c:\\TEMP\\eclipse.zip", "c:\\TEMP2\\xxx2.zip ");
     }
 
     //input from file to Map
@@ -157,46 +157,48 @@ public class Main {
         }
     }
 
-    //copyFile with block 10 kb
-    public static void copyFile(String from, String to) {
+    //copyFile with  bytes
+    public static void copyFileBytes(String from, String to) {
         try (InputStream is = new FileInputStream(from);
              OutputStream os = new FileOutputStream(to)) {
-            int read;
-            byte[] buffer = new byte[10000];
-            while ((read = is.read(buffer)) != -1) {
-                System.out.println("Read bytes " + read);
-                os.write(buffer);
+            int readFile;
+            while ((readFile = is.read()) != -1) {
+                System.out.println("Availiable " + is.available());
+                os.write(readFile);
             }
+            is.close();
         } catch (IOException ex) {
             ex.printStackTrace();
         }
     }
 
-    //copyFile with bytes
-    public static void copyFileBuff(String from, String to) {
-        try (BufferedReader is = new BufferedReader(new FileReader(from));
-             BufferedWriter os = new BufferedWriter(new FileWriter(to))) {
-            int read;
-            while ((read = is.read()) != -1) {
-                os.write(read);
+    //copyFile with blocks of bytes
+    public static void copyFileBlocksOfBytes(String from, String to) {
+        try (InputStream is = new FileInputStream(from);
+             OutputStream os = new FileOutputStream(to)) {
+            byte[] buffer = new byte[10000];
+            while ((is.read(buffer)) != -1) {
+                os.write(buffer);
             }
         } catch (IOException ex) {
             ex.printStackTrace();
-
         }
     }
 
     //copyFile with available()
-    public static void copyFileAvailable(String from, String to) {
+    public static void copyFileWithAvailable(String from, String to) {
         try (InputStream is = new FileInputStream(from);
              OutputStream os = new FileOutputStream(to)) {
-            byte[] buffer = new byte[10000];
-            while (is.available() != -1) {
+            byte[] buffer = new byte[256];
+            while (is.available() != 0) {
+                is.read(buffer);
                 os.write(buffer);
             }
+
         } catch (IOException ex) {
             ex.printStackTrace();
         }
+
     }
 
 
