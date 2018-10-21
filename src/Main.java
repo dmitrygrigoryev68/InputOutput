@@ -16,15 +16,24 @@ public class Main {
             ex.printStackTrace();
         }
 
-        outputFromMapToFile(InputToSortedMapByBirthday("inputbirthdaylist.txt"));
-    }
+        Key keyBirthday = s -> Integer.parseInt(s.substring(s.indexOf(",")).substring(7)
+                + s.substring(s.indexOf(",")).substring(4, 6)
+                + s.substring(s.indexOf(",")).substring(1, 3));
+        Key keyPrice = s -> Integer.parseInt(s.split(",")[s.split(",").length - 1]);
 
-    public static Map<Integer, String> InputToSortedMapByBirthday(String fileName) {
+
+        outputFromMapToFile(InputToSortedMapByBirthday("inputbirthdaylist.txt",keyBirthday));
+
+        outputFromMapToFile(InputToSortedMapByBirthday("gadgets.txt",keyPrice));
+}
+
+
+    public static Map<Integer, String> InputToSortedMapByBirthday(String fileName, Key key) {
         Map<Integer, String> map = new TreeMap<>();
         try (BufferedReader is = new BufferedReader(new FileReader(fileName))) {
             String currentLine;
             while ((currentLine = is.readLine()) != null) {
-                map.put(bithDayTransformer(currentLine), currentLine);
+                map.put(key.key(currentLine), currentLine);
             }
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -32,18 +41,9 @@ public class Main {
         return map;
     }
 
-    public static Integer bithDayTransformer(String string) {
-        String date = string.substring(string.indexOf(","));
-        return Integer.parseInt(date.substring(7) + date.substring(4, 6) + date.substring(1, 3));
-    }
-
-    public static Integer priceTransformer(String string) {
-        String [] price = string.split(",");
-        return Integer.parseInt(price[price.length-1]);
-    }
 
     public static void outputFromMapToFile(Map<Integer, String> map) {
-        try (BufferedWriter printer = new BufferedWriter(new FileWriter("outputbirthday.txt"))) {
+        try (BufferedWriter printer = new BufferedWriter(new FileWriter("outputgadgets.txt"))) {
             for (String s : map.values()) {
                 printer.write(s);
                 printer.newLine();
