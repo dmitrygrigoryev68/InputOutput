@@ -15,6 +15,6 @@ public class Person {
 
     @Override
     public String toString() {
-        return "People older then 17 - Name: " + name  + ", age=" + age;
+        return "Name: " + name  + ", age=" + age;
     }
 }

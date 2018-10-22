@@ -47,15 +47,16 @@ public class Main {
 //1.2
         System.out.println(sortedArray(strings));
 //1.3
-        myListPrinter(sortByAge("test.csv"));
+        myListPrinter(inputAndSortPersonByAge("test.csv"));
 //1.4
         outputFromSortedByAgeListToFile(persons, "output.csv");
 //2.1.1
         //copyFileBytes("c:\\TEMP\\eclipse.zip", "c:\\TEMP2\\xxx.zip ");
 //2.1.2
-        copyFileBlocksOfBytes("c:\\TEMP\\eclipse.zip", "c:\\TEMP2\\xxx1.zip ");
+        //copyFileBlocksOfBytes("c:\\TEMP\\eclipse.zip", "c:\\TEMP2\\xxx1.zip ");
 //2.1.3
-        copyFileWithAvailable("c:\\TEMP\\eclipse.zip", "c:\\TEMP2\\xxx2.zip ");
+        //   copyFileWithAvailable("c:\\TEMP\\eclipse.zip", "c:\\TEMP2\\xxx2.zip ");
+        System.out.println(inputToPersonForGadgets("inputGadgetPriceList.txt"));
     }
 
     //input from file to Map
@@ -74,10 +75,10 @@ public class Main {
 
     //output from Map to file
     public static void outputFromMapToFile(Map<Integer, String> map, String fileName) {
-        try (BufferedWriter printer = new BufferedWriter(new FileWriter(fileName))) {
+        try (BufferedWriter os = new BufferedWriter(new FileWriter(fileName))) {
             for (String s : map.values()) {
-                printer.write(s);
-                printer.newLine();
+                os.write(s);
+                os.newLine();
             }
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -109,7 +110,7 @@ public class Main {
     }
 
     //input from file to List of persons, age > 17
-    public static List<Person> sortByAge(String fileName) {
+    public static List<Person> inputAndSortPersonByAge(String fileName) {
         List<Person> list = new LinkedList<>();
         try (BufferedReader is = new BufferedReader(new FileReader(fileName))) {
             String currentLine;
@@ -199,6 +200,27 @@ public class Main {
             ex.printStackTrace();
         }
 
+    }
+    public static Map<String,Integer> inputToPersonForGadgets(String fileName) {
+
+        Map<String,Integer> result = new HashMap<>();
+        try (BufferedReader is = new BufferedReader(new FileReader(fileName))) {
+            result = is.lines().map(s -> stringToPersonForGadgetTransformer(s))
+                    .collect(Collectors.groupingBy((p -> p.getFullName()),
+                            Collectors.summingInt((p -> p.getLaptop().getPrice()))));
+
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        return result;
+    }
+    public static PersonForGadget stringToPersonForGadgetTransformer(String string) {
+        String [] strings = string.split(",");
+        Laptop laptop = new Laptop(strings[2],Integer.valueOf(strings[3]));
+        laptop.setPrice(Integer.parseInt(string.split(",")[3]));
+        PersonForGadget person = new PersonForGadget(strings[0],strings[1],laptop);
+
+        return person;
     }
 
 
