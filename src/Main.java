@@ -51,7 +51,7 @@ public class Main {
 //1.4
         outputFromSortedByAgeListToFile(persons, "output.csv");
 //2.1.1
-        copyFileBytes("c:\\TEMP\\eclipse.zip", "c:\\TEMP2\\xxx.zip ");
+        //copyFileBytes("c:\\TEMP\\eclipse.zip", "c:\\TEMP2\\xxx.zip ");
 //2.1.2
         copyFileBlocksOfBytes("c:\\TEMP\\eclipse.zip", "c:\\TEMP2\\xxx1.zip ");
 //2.1.3
@@ -103,7 +103,7 @@ public class Main {
         List<String> list = Arrays.asList(strings);
         return list
                 .stream()
-                .sorted(new StringByLengthComparator())
+                .sorted(Comparator.comparingInt(s -> s.length()))
                 .collect(Collectors.toList());
 
     }
