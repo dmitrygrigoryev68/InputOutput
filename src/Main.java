@@ -1,11 +1,16 @@
 import java.io.*;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.Map.Entry;
 
 public class Main {
 
-    public static void main(String[] args) {
+     public static void main(String[] args) {
 
         //Create string array for 1.2
         String[] strings = {"aaa", "bbb", "a", "bb"};
@@ -50,6 +55,8 @@ public class Main {
 //2.2.
         personForGadgets("inputTest.csv",
                 "outputSortedBySumOfGadgets.csv");
+
+         System.out.println(diffDatesFromFile("dates.txt"));
     }
 
     //input from file to Map
@@ -58,7 +65,7 @@ public class Main {
         try (BufferedReader is = new BufferedReader(new FileReader(inputFileName));
              PrintWriter pw = new PrintWriter(outputFileName)) {
             is.lines()
-                    .collect(Collectors.groupingBy(s -> dateReverse(s)))
+                    .collect(Collectors.groupingBy(s -> dateTransformer(s.split(",")[1])))
                     .entrySet()
                     .stream()
                     .sorted(Entry.comparingByKey())
@@ -146,11 +153,18 @@ public class Main {
 
         return person;
     }
+
     //Date reverse function
-    public static int dateReverse(String s) {
-        return Integer.parseInt(s.substring(s.indexOf(",")).substring(7)
-                + s.substring(s.indexOf(",")).substring(4, 6)
-                + s.substring(s.indexOf(",")).substring(1, 3));
+    public static Date dateTransformer(String string) {
+        DateFormat format = new SimpleDateFormat("dd-MM-yyyy",Locale.GERMANY);
+        Date date = null;
+        try {
+            date = format.parse(string);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return date;
+
     }
     //copyFile with  bytes
     public static void copyFileBytes(String from, String to) {
@@ -191,5 +205,34 @@ public class Main {
         } catch (IOException ex) {
             ex.printStackTrace();
         }
+    }
+    public static Integer diffFromFile(String fileName) {
+        Integer diff = 0;
+        try (BufferedReader is = new BufferedReader(new FileReader(fileName))) {
+            List<Integer> list = is
+                    .lines()
+                    .map(i -> Integer.valueOf(i))
+                    .sorted()
+                    .collect(Collectors.toList());
+            diff = list.get(list.size()-1) - list.get(0);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        return diff;
+    }
+    public static Long diffDatesFromFile(String fileName) {
+        Long diff = Long.valueOf(0);
+        try (BufferedReader is = new BufferedReader(new FileReader(fileName))) {
+            List<LocalDate> list = is
+                    .lines()
+                    .map(s->LocalDate.parse(s))
+                    .sorted()
+                    .collect(Collectors.toList());
+            diff = ChronoUnit.DAYS.between(list.get(0),list.get(list.size()-1));
+
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        return diff;
     }
 }
