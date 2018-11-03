@@ -1,8 +1,7 @@
 import java.io.*;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -10,7 +9,7 @@ import java.util.Map.Entry;
 
 public class Main {
 
-     public static void main(String[] args) {
+    public static void main(String[] args) {
 
         //Create string array for 1.2
         String[] strings = {"aaa", "bbb", "a", "bb"};
@@ -56,7 +55,11 @@ public class Main {
         personForGadgets("inputTest.csv",
                 "outputSortedBySumOfGadgets.csv");
 
-         System.out.println(diffDatesFromFile("dates.txt"));
+        System.out.println(diffDatesFromFile("dates.txt"));
+
+       datesToRussianStandart("inputDates.txt",
+              "outputDates.txt");
+      //  dateTransformerToRussian("14 Nov 2012");
     }
 
     //input from file to Map
@@ -106,7 +109,7 @@ public class Main {
                     .entrySet()
                     .stream()
                     .sorted(Entry.comparingByKey())
-                    .filter(s->s.getKey()>17)
+                    .filter(s -> s.getKey() > 17)
                     .forEach((e) -> System.out.println(e.getValue().values()));
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -155,17 +158,13 @@ public class Main {
     }
 
     //Date reverse function
-    public static Date dateTransformer(String string) {
-        DateFormat format = new SimpleDateFormat("dd-MM-yyyy",Locale.GERMANY);
-        Date date = null;
-        try {
-            date = format.parse(string);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
+    public static LocalDate dateTransformer(String string) {
+        LocalDate date = LocalDate
+                .parse(string,DateTimeFormatter.ofPattern("dd-MM-yyyy"));
         return date;
 
     }
+
     //copyFile with  bytes
     public static void copyFileBytes(String from, String to) {
         try (InputStream is = new FileInputStream(from);
@@ -206,6 +205,7 @@ public class Main {
             ex.printStackTrace();
         }
     }
+
     public static Integer diffFromFile(String fileName) {
         Integer diff = 0;
         try (BufferedReader is = new BufferedReader(new FileReader(fileName))) {
@@ -214,25 +214,51 @@ public class Main {
                     .map(i -> Integer.valueOf(i))
                     .sorted()
                     .collect(Collectors.toList());
-            diff = list.get(list.size()-1) - list.get(0);
+            diff = list.get(list.size() - 1) - list.get(0);
         } catch (IOException ex) {
             ex.printStackTrace();
         }
         return diff;
     }
+
     public static Long diffDatesFromFile(String fileName) {
         Long diff = Long.valueOf(0);
         try (BufferedReader is = new BufferedReader(new FileReader(fileName))) {
             List<LocalDate> list = is
                     .lines()
-                    .map(s->LocalDate.parse(s))
+                    .map(s -> LocalDate.parse(s))
                     .sorted()
                     .collect(Collectors.toList());
-            diff = ChronoUnit.DAYS.between(list.get(0),list.get(list.size()-1));
+            diff = ChronoUnit.DAYS.between(list.get(0), list.get(list.size() - 1));
 
         } catch (IOException ex) {
             ex.printStackTrace();
         }
         return diff;
+    }
+
+    public static void datesToRussianStandart(String inputFileName, String outputFileName) {
+        try (BufferedReader is = new BufferedReader(new FileReader(inputFileName));
+             PrintWriter pw = new PrintWriter(outputFileName)) {
+            is
+                    .lines()
+                    .sorted()
+                    .map(s -> dateTransformerToRussian(s))
+                    .forEach(s -> pw.write(s + "\r\n"));
+
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+
+    }
+
+    public static String dateTransformerToRussian(String string) {
+        String date =
+                DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL)
+                        .withLocale(new Locale("fr"))
+                        .format(LocalDate.parse(LocalDate
+                        .parse(string,DateTimeFormatter
+                        .ofPattern("dd MMM yyyy")).toString()));
+        return date;
     }
 }
